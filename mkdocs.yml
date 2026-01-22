@@ -1,0 +1,13 @@
+site_name: TKJHAT Micropython API
+
+nav:
+  - Home: index.md
+  - About: about.md
+  - Tatu: Tatu.md
+  - Alisa: Alisa.md
+  - Aleksanteri: Aleksanteri.md
+  - Sensors:
+      - Sensor Overview: Sensors/sensor_overview.md
+      - HDC2021: Sensors/hdc2021.md
+
+theme: readthedocs
