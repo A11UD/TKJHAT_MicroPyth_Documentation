@@ -160,14 +160,14 @@ class HDC2021:
         self.set_humidity_resolution_14bit()
         self.trigger_measurement()
 
-    def read_temperature(self):
+    def read_temperature(self) -> float:
         """
         Read temperature in Celsius
         """
         base_temp = self._read_u16(self.TEMP_LOW)
         return (base_temp * 165.0 / 65536.0) - 40.0
 
-    def read_humidity(self):
+    def read_humidity(self) -> float:
         """
         Read relative humidity in %
         """
