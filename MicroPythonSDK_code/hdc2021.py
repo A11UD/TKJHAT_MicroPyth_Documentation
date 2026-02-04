@@ -49,11 +49,15 @@ class HDC2021:
     # Low-level I2C helpers
 
     def _read_u8(self, reg):
-        """Read one byte from a register"""
+        """
+        Read one byte from a register
+        """
         return self.i2c.readfrom_mem(self.ADDRESS, reg, 1)[0]
 
     def _write_u8(self, reg, value):
-        """Write one byte to a register"""
+        """
+        Write one byte to a register
+        """
         self.i2c.writeto_mem(self.ADDRESS, reg, bytes([value & 0xFF]))
 
     def _read_u16(self, reg):

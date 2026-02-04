@@ -9,5 +9,7 @@ nav:
   - Sensors:
       - Sensor Overview: Sensors/sensor_overview.md
       - HDC2021: Sensors/hdc2021.md
+      - Buzzer:  Sensors/buzzer.md
+      - Buttons:  Sensors/buttons.md
 
 theme: readthedocs
