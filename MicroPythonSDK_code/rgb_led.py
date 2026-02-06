@@ -7,24 +7,24 @@ class Rgb_led:
     RGB_LED_G = 19
     RGB_LED_B = 20
     # PWM frequency
-    RGB_FREQ = 500
+    RGB_FREQ = 480
 
     # Constructor
     def __init__(self):
         self.pwm_r = None
         self.pwm_g = None
         self.pwm_b = None
-        self.initalized = False
+        self.initialized = False
 
 
     # Public API
 
     def init(self):
-        """Initalize rgb pins to use PWM"""
+        """Initialize rgb pins to use PWM"""
         self.pwm_r = PWM(Pin(self.RGB_LED_R), freq=self.RGB_FREQ)
         self.pwm_g = PWM(Pin(self.RGB_LED_G), freq=self.RGB_FREQ)
         self.pwm_b = PWM(Pin(self.RGB_LED_B), freq=self.RGB_FREQ)
-        self.initalized = True
+        self.initialized = True
 
 
     def write(self, r: int, g: int, b: int):
@@ -38,7 +38,7 @@ class Rgb_led:
         :param b: blue intensity (0-255, 0 = off, 255 = full on)
         :type b: int
         """
-        if self.initalized:
+        if self.initialized:
             #ensure values are in range 0-255
             r = 0 if r < 0 else 255 if r > 255 else r
             g = 0 if g < 0 else 255 if g > 255 else g
@@ -64,7 +64,7 @@ class Rgb_led:
     def stop(self):
         """Disable the PWM output for rgb pins"""
 
-        if self.initalized:
+        if self.initialized:
 
             # Set output to 0
             self.write(0, 0, 0)
@@ -79,3 +79,5 @@ class Rgb_led:
             Pin(self.RGB_LED_G, Pin.IN)
             Pin(self.RGB_LED_B, Pin.IN)
 
+            self.initialized = False
+            
