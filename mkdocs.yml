@@ -11,5 +11,7 @@ nav:
       - HDC2021: Sensors/hdc2021.md
       - Buzzer:  Sensors/buzzer.md
       - Buttons:  Sensors/buttons.md
+      - Led: Sensors/led.md
+      - RGB Led:  Sensors/rgb_led.md
 
 theme: readthedocs
