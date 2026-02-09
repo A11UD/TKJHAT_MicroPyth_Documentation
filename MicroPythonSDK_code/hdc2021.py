@@ -151,32 +151,42 @@ class HDC2021:
         """
         Initialize sensor 
         """
-        self.reset()
+        try:
+            self.reset()
 
-        self.set_high_temp_threshold(50)
-        self.set_low_temp_threshold(-30)
-        self.set_high_humidity_threshold(100)
-        self.set_low_humidity_threshold(0)
+            self.set_high_temp_threshold(50)
+            self.set_low_temp_threshold(-30)
+            self.set_high_humidity_threshold(100)
+            self.set_low_humidity_threshold(0)
 
-        self.set_measurement_mode()
-        self.set_rate_1hz()
-        self.set_temp_resolution_14bit()
-        self.set_humidity_resolution_14bit()
-        self.trigger_measurement()
+            self.set_measurement_mode()
+            self.set_rate_1hz()
+            self.set_temp_resolution_14bit()
+            self.set_humidity_resolution_14bit()
+            self.trigger_measurement()
+        except OSError:
+            pass
+
 
     def read_temperature(self) -> float:
         """
         Read temperature in Celsius
         """
-        base_temp = self._read_u16(self.TEMP_LOW)
-        return (base_temp * 165.0 / 65536.0) - 40.0
+        try:
+            base_temp = self._read_u16(self.TEMP_LOW)
+            return (base_temp * 165.0 / 65536.0) - 40.0
+        except OSError:
+            return None
 
     def read_humidity(self) -> float:
         """
         Read relative humidity in %
         """
-        base_humidity = self._read_u16(self.HUMID_LOW)
-        return base_humidity * 100.0 / 65536.0
+        try:
+            base_humidity = self._read_u16(self.HUMID_LOW)
+            return base_humidity * 100.0 / 65536.0
+        except OSError:
+            return None
 
     def stop(self):
         """
