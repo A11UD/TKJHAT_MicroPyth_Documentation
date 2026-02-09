@@ -107,7 +107,7 @@ class Display:
 
     def write_text(self, text: str, delay_ms: int = 0):
         """
-        Write text at a default centered-ish position.
+        Write text at a default centered position.
         """
         if not text:
             return
