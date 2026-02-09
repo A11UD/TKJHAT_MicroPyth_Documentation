@@ -32,32 +32,32 @@ rgb.stop()
 class Rgb_led() creates an rgb led instance.
 
 ## Function documentation
-## `init()`
+# `init()`
 Initialize the rgb led  
 
-**What it does:**
+### What it does:
 - Creates GPIO pin objects for color channels red, green and blue
 - Wraps the pins with PWM controllers so its duty cycle can be varied to control brightness of the color channel.
 - Sets a flag `initialized` to True.  
 
-## `write(r: int, g: int, b: int) -> None`
+# `write(r: int, g: int, b: int) -> None`
 Set color for rgb led using values in range 0-255 (0 = off, 255 = full on)  
 
-**Parameters:**  
+### Parameters: 
 - r: red intensity (0-255, 0 = off, 255 = full on)
 - g: green intensity (0-255, 0 = off, 255 = full on)
 - b: blue intensity (0-255, 0 = off, 255 = full on)  
 
-**What it does:**  
+### What it does:  
 - Ensures values are in range 0-255.
 - Inverts the values, because the rgb led is wired as common anode.
 - Converts the inverted values linearly to a 16-bit duty cycle.
 - Finally sets the inverted and converted values for red, green and blue.
 
-## `stop() -> None`
+# `stop() -> None`
 Disable the PWM output for the rgb pins  
 
-**What it does:**  
+### What it does:  
 - Sets the rgb led off.
 - Disables the PWM output
 - Sets the pins to input state. This ensures the pins are in Hi-Z state and prevents any unintended LED glow.
