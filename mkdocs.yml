@@ -13,5 +13,6 @@ nav:
       - Buttons:  Sensors/buttons.md
       - Led: Sensors/led.md
       - RGB Led:  Sensors/rgb_led.md
+      - VEML6030: Sensors/veml6030.md
 
 theme: readthedocs
