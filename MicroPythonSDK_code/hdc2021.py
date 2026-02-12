@@ -14,7 +14,6 @@
 
 import time
 
-
 class HDC2021:
 
     # I2C address
@@ -42,8 +41,8 @@ class HDC2021:
 
     # Constructor
 
-    def __init__(self, i2c):
-        self.i2c = i2c
+    def __init__(self, bus):
+        self.bus = bus
 
 
     # Low-level I2C helpers
@@ -52,19 +51,19 @@ class HDC2021:
         """
         Read one byte from a register
         """
-        return self.i2c.readfrom_mem(self.ADDRESS, reg, 1)[0]
+        return self.bus.readfrom_mem(self.ADDRESS, reg, 1)[0]
 
     def _write_u8(self, reg, value):
         """
         Write one byte to a register
         """
-        self.i2c.writeto_mem(self.ADDRESS, reg, bytes([value & 0xFF]))
+        self.bus.writeto_mem(self.ADDRESS, reg, bytes([value & 0xFF]))
 
     def _read_u16(self, reg):
         """
         Read two bytes (LSB first) and return a 16-bit value
         """
-        data = self.i2c.readfrom_mem(self.ADDRESS, reg, 2)
+        data = self.bus.readfrom_mem(self.ADDRESS, reg, 2)
         return data[1] * 256 + data[0]
 
 
@@ -192,9 +191,12 @@ class HDC2021:
         """
         Stop continuous measurement and reduce power
         """
-        config = self._read_u8(self.CONFIG)
-        config = config & 0x8F      # disable auto-measurement
-        config = config & 0xF3      # disable heater + interrupt
-        self._write_u8(self.CONFIG, config)
-        meas = self._read_u8(self.MEAS_CONFIG)
-        self._write_u8(self.MEAS_CONFIG, meas & 0xFE)
+        try:
+            config = self._read_u8(self.CONFIG)
+            config = config & 0x8F      # disable auto-measurement
+            config = config & 0xF3      # disable heater + interrupt
+            self._write_u8(self.CONFIG, config)
+            meas = self._read_u8(self.MEAS_CONFIG)
+            self._write_u8(self.MEAS_CONFIG, meas & 0xFE)
+        except OSError:
+            return None

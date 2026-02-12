@@ -8,11 +8,11 @@ nav:
   - Aleksanteri: Aleksanteri.md
   - Sensors:
       - Sensor Overview: Sensors/sensor_overview.md
-      - HDC2021: Sensors/hdc2021.md
+      - Temp & Humi - HDC2021: Sensors/hdc2021.md
       - Buzzer:  Sensors/buzzer.md
       - Buttons:  Sensors/buttons.md
       - Led: Sensors/led.md
       - RGB Led:  Sensors/rgb_led.md
-      - VEML6030: Sensors/veml6030.md
-
+      - Ambient Light - VEML6030: Sensors/veml6030.md
+      - Gyro - ICM42670: Sensors/icm42670.md
 theme: readthedocs

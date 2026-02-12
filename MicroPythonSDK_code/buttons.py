@@ -51,6 +51,8 @@ class Buttons:
         """
         Return True if button 1 is pressed.
         """
+        if self.button1 is None:
+            return False
         return self.button1.value() == 1
 
 
@@ -58,6 +60,8 @@ class Buttons:
         """
         Return True if button 2 is pressed.
         """
+        if self.button2 is None:
+            return False
         return self.button2.value() == 1
 
 
