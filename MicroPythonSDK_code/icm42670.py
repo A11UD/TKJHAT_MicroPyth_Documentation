@@ -55,8 +55,8 @@ class ICM42670:
     GYRO_ODR_DEFAULT = 100
     GYRO_FSR_DEFAULT = 250
 
-    def __init__(self, i2c, address=ADDRESS):
-        self.i2c = i2c
+    def __init__(self, bus, address=ADDRESS):
+        self.bus = bus
         self.address = address
 
         # Scale factors (LSB per unit)
@@ -67,13 +67,13 @@ class ICM42670:
     # Low-level I2C helpers
     # -------------------------
     def _read_u8(self, reg):
-        return self.i2c.readfrom_mem(self.address, reg, 1)[0]
+        return self.bus.readfrom_mem(self.address, reg, 1)[0]
 
     def _write_u8(self, reg, value):
-        self.i2c.writeto_mem(self.address, reg, bytes([value & 0xFF]))
+        self.bus.writeto_mem(self.address, reg, bytes([value & 0xFF]))
 
     def _read_bytes(self, reg, n):
-        return self.i2c.readfrom_mem(self.address, reg, n)
+        return self.bus.readfrom_mem(self.address, reg, n)
 
     @staticmethod
     def _to_i16(msb, lsb):

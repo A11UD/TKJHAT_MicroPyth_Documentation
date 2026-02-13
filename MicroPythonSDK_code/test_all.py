@@ -10,6 +10,7 @@ from buttons import Buttons
 from led import Led
 from rgb_led import Rgb_led
 from display import Display
+from veml6030 import VEML6030
 
 
 # -------------------------
@@ -32,8 +33,10 @@ display.init()
 sensor = HDC2021(bus)
 sensor.init()
 
-# IMU still uses raw I2C (no locking added there)
-imu = ICM42670(i2c)
+light_sensor = VEML6030(bus)
+light_sensor.init()
+
+imu = ICM42670(bus)
 imu.init()
 imu.start_with_default_values()
 
@@ -90,7 +93,15 @@ time.sleep(1.0)
 # -------------------------
 
 last_display = time.ticks_ms()
-show_imu = False
+
+
+states = {
+    "show_temp" : 0,
+    "show_light" : 1,
+    "show_imu" : 2
+}
+state = states["show_temp"]
+
 
 while True:
 
@@ -131,7 +142,7 @@ while True:
 
     if time.ticks_diff(now, last_display) >= 1000:
 
-        if not show_imu:
+        if state == states["show_temp"]:
             temp = sensor.read_temperature()
             hum = sensor.read_humidity()
 
@@ -143,6 +154,22 @@ while True:
             else:
                 display.write_text_xy(0, 16, "Temp: {:.1f} C".format(temp))
                 display.write_text_xy(0, 32, "Hum : {:.1f} %".format(hum))
+
+            state = states["show_light"]
+
+        elif state == states["show_light"]:
+            light = light_sensor.read()
+
+            display.clear()
+            display.write_text_xy(0, 0, "VEML6030")
+
+            if light is None:
+                display.write_text_xy(0, 16, "Read failed")
+            else:
+                display.write_text_xy(0, 16, "Light: {:.1f} Lux".format(light))
+
+            state = states["show_imu"]
+
 
         else:
             d = imu.read_sensor_data()
@@ -158,7 +185,8 @@ while True:
                 display.write_text_xy(0, 32, "gz: {:.1f} dps".format(gz))
                 display.write_text_xy(0, 48, "t : {:.1f} C".format(t))
 
-        show_imu = not show_imu
+            state = states["show_temp"]
+
         last_display = now
 
     time.sleep(0.05)
