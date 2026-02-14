@@ -65,7 +65,7 @@ class I2CBusManager:
         finally:
             self._release()
 
-    def writeto(self, addr, data, stop):
+    def writeto(self, addr, data, stop=True):
         self._acquire()
         try:
             self.i2c.writeto(addr, data, stop)
