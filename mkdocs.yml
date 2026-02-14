@@ -15,4 +15,5 @@ nav:
       - RGB Led:  Sensors/rgb_led.md
       - Ambient Light - VEML6030: Sensors/veml6030.md
       - Gyro - ICM42670: Sensors/icm42670.md
+      - Display - SSD1306: Sensors/display.md
 theme: readthedocs
