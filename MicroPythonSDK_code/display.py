@@ -47,6 +47,16 @@ class Display:
         )
 
 
+    def _locked_call(self, func, *args, **kwargs):
+        """
+        Execute a function while holding the I2C bus lock.
+        """
+        self.bus._acquire()
+        try:
+            return func(*args, **kwargs)
+        finally:
+            self.bus._release()
+
     # Initialization and power control
 
 
@@ -61,16 +71,10 @@ class Display:
             pass
 
     def power_on(self):
-        """
-        Turn the display on.
-        """
-        self.oled.poweron()
+        self._locked_call(self.oled.poweron)
 
     def power_off(self):
-        """
-        Turn the display off.
-        """
-        self.oled.poweroff()
+        self._locked_call(self.oled.poweroff)
 
 
     # Internal update helper
@@ -81,14 +85,12 @@ class Display:
         Update the physical display from the buffer.
         Locking prevents concurrent I2C access.
         """
-        self.bus._acquire()
+        
         try:
-            self.oled.show()
+            self._locked_call(self.oled.show)
         except OSError:
             print("Display I2C error")
             pass
-        finally:
-            self.bus._release()
 
  
 
