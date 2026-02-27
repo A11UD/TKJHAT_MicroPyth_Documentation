@@ -1,4 +1,7 @@
-# Fake machine module for avoiding ModuleNotFoundError when running tests with modules using machine
+# machine.py
+# Fake machine module for avoiding ModuleNotFoundError when running tests
+# DO NOT UPLOAD THIS FILE TO YOUR PICO. It will override the actual built-in machine module.
+# 
 
 class PWM:
     def __init__(self):
