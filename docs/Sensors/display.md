@@ -177,13 +177,13 @@ Draw a circle using a midpoint algorithm.
 - **fill**: if True, draw filled circle.
 
 
-### Notes:
+#### Notes:
 - The display uses an internal framebuffer.
 - Drawing operations modify the buffer first.
 - show() transfers the buffer to the OLED hardware.
 - I2C locking is handled inside show() to prevent concurrent access.
 
-### See also
+#### See also
 - SSD1306 datasheet :https://cdn-shop.adafruit.com/datasheets/SSD1306.pdf
 - SSD1306 Driver :https://github.com/TimHanewich/MicroPython-SSD1306/tree/master
 

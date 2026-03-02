@@ -2,7 +2,7 @@
 Module containing functions for controlling TKJHAT leds
 '''
 from machine import Pin
-from utime import sleep_ms
+import time
 
 class Led:
 
@@ -33,8 +33,8 @@ class Led:
         if self.pin is not None:
             for i in range(n):
                 self.pin.toggle()
-                sleep_ms(self.TOGGLE_SLEEP_TIME)
+                time.sleep_ms(self.TOGGLE_SLEEP_TIME)
                 self.pin.toggle()
-                sleep_ms(self.TOGGLE_SLEEP_TIME)
+                time.sleep_ms(self.TOGGLE_SLEEP_TIME)
             self.pin.value(False)
             

@@ -1,11 +1,8 @@
 site_name: TKJHAT Micropython API
+site_url: https://A11UD.github.io/TKJHAT_MicroPyth_Documentation/
 
 nav:
   - Home: index.md
-  - About: about.md
-  - Tatu: Tatu.md
-  - Alisa: Alisa.md
-  - Aleksanteri: Aleksanteri.md
   - Sensors:
       - Sensor Overview: Sensors/sensor_overview.md
       - Temp & Humi - HDC2021: Sensors/hdc2021.md

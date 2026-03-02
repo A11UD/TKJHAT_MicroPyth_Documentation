@@ -1,5 +1,5 @@
 
-from utime import sleep_ms
+import time
 
 class VEML6030:
 
@@ -56,7 +56,7 @@ class VEML6030:
         """ 
         config = [self.CONFIG, 0x00, 0x10]      #[command code, data(LSB), data(MSB)]
         self.write_u24(config)
-        sleep_ms(10)
+        time.sleep_ms(10)
 
 
     def read(self):
@@ -89,4 +89,4 @@ class VEML6030:
             # 0b0001 0000 0000 0001
         config = [self.CONFIG, 0x01, 0x10]   #[command code, data(LSB), data(MSB)]
         self.write_u24(config)
-        sleep_ms(10)
+        time.sleep_ms(10)
