@@ -150,14 +150,20 @@ class ICM42670:
 
     def init(self):
         """
+        Initialize the IMU and verify device identity.
+
+        The driver first autodetects the I2C address (0x68 / 0x69) by reading WHO_AM_I,
+        then performs a soft reset on the detected address and re-checks WHO_AM_I.
+
         Returns 0 on success, negative on error.
         """
         try:
-            self.soft_reset()
-
             addr = self._autodetect_address()
             if addr is None:
                 return -1
+
+            # Reset on the correct address
+            self.soft_reset()
 
             who = self._read_u8(self.REG_WHO_AM_I)
             if who != self.WHO_AM_I_RESPONSE:
@@ -224,6 +230,14 @@ class ICM42670:
             return -1
 
     def start_with_default_values(self):
+        """
+        Convenience setup for typical exercises (low-noise mode + default ODR/FSR).
+        Returns 0 on success, negative on error.
+        """
+        rc = self.enable_accel_gyro_ln_mode()
+        if rc != 0:
+            return rc
+
         rc = self.startAccel(self.ACCEL_ODR_DEFAULT, self.ACCEL_FSR_DEFAULT)
         if rc != 0:
             return rc
@@ -232,12 +246,8 @@ class ICM42670:
         if rc != 0:
             return rc
 
-        rc = self.enable_accel_gyro_ln_mode()
-        if rc != 0:
-            return rc
-
         return 0
-    
+
     def calibrateGyro(self, dest2=None, samples=800, settle_ms=2000,
                     reject_if_abs_dps=5.0, sample_delay_ms=10):
         """
@@ -252,7 +262,7 @@ class ICM42670:
         """
 
         old_g = self.g_bias[:]
-        self.g_bias = [0.0, 0.0, 0.0]    
+        self.g_bias = [0.0, 0.0, 0.0]
 
         # settle/warm-up
         t0 = time.ticks_ms()
@@ -283,6 +293,7 @@ class ICM42670:
             time.sleep_ms(sample_delay_ms)
 
         if good < max(10, samples // 4):
+            self.g_bias = old_g
             return None
 
         bx, by, bz = sx / good, sy / good, sz / good
@@ -346,6 +357,7 @@ class ICM42670:
             time.sleep_ms(sample_delay_ms)
 
         if good < max(10, samples // 4):
+            self.a_bias = old_a
             return None
 
         axm, aym, azm = sx / good, sy / good, sz / good
