@@ -63,6 +63,13 @@ class ICM42670:
         self.aRes = 8192.0   # for ±4g
         self.gRes = 131.0    # for ±250 dps
 
+        # Calibration state (bias in user units: g and dps)
+        self.g_bias = [0.0, 0.0, 0.0]
+        self.a_bias = [0.0, 0.0, 0.0]
+
+        # Optional: ignore tiny gyro noise for motion detection
+        self.g_deadband_dps = 0.0
+
     # -------------------------
     # Low-level I2C helpers
     # -------------------------
@@ -230,6 +237,139 @@ class ICM42670:
             return rc
 
         return 0
+    
+    def calibrateGyro(self, dest2=None, samples=800, settle_ms=2000,
+                    reject_if_abs_dps=5.0, sample_delay_ms=10):
+        """
+        Measure and apply gyroscope zero-rate bias (offset) while the device is stationary.
+
+        The function collects multiple gyro samples, rejects samples that indicate motion,
+        computes the mean bias for each axis in dps, and stores the result to self.g_bias.
+        If dest2 is provided (a list of length 3), it is filled with [bx, by, bz].
+
+        Returns:
+            (bx, by, bz) on success, or None if not enough valid samples were collected.
+        """
+
+        old_g = self.g_bias[:]
+        self.g_bias = [0.0, 0.0, 0.0]    
+
+        # settle/warm-up
+        t0 = time.ticks_ms()
+        while time.ticks_diff(time.ticks_ms(), t0) < settle_ms:
+            self.read_sensor_data()
+            time.sleep_ms(5)
+
+        sx = sy = sz = 0.0
+        good = 0
+
+        for _ in range(samples):
+            d = self.read_sensor_data()
+            if d is None:
+                continue
+
+            ax, ay, az, gx, gy, gz, temp = d
+
+            # reject samples if device is moving
+            if (abs(gx) > reject_if_abs_dps or
+                abs(gy) > reject_if_abs_dps or
+                abs(gz) > reject_if_abs_dps):
+                continue
+
+            sx += gx
+            sy += gy
+            sz += gz
+            good += 1
+            time.sleep_ms(sample_delay_ms)
+
+        if good < max(10, samples // 4):
+            return None
+
+        bx, by, bz = sx / good, sy / good, sz / good
+        self.g_bias[0], self.g_bias[1], self.g_bias[2] = bx, by, bz
+
+        if dest2 is not None:
+            dest2[0], dest2[1], dest2[2] = bx, by, bz
+
+        return bx, by, bz
+
+
+    def calibrateAccel(self, dest1=None, samples=800, settle_ms=2000,
+                   assume_up_axis="z", assume_up_sign=+1,
+                   reject_if_abs_dps=5.0, sample_delay_ms=10):
+        """
+        Measure and apply accelerometer bias (offset) while the device is stationary
+        in a known orientation.
+
+        The function collects multiple accel samples, rejects samples that indicate motion,
+        computes the mean measured acceleration, compares it against an expected gravity
+        vector (±1 g along the selected axis), and stores the resulting bias to self.a_bias.
+        If dest1 is provided (a list of length 3), it is filled with [bx, by, bz].
+
+        Parameters:
+            assume_up_axis: Axis expected to align with gravity ("x", "y", or "z").
+            assume_up_sign: +1 if that axis should read +1 g, -1 if it should read -1 g.
+
+        Returns:
+            (bx, by, bz) on success, or None if not enough valid samples were collected.
+        """
+
+        old_a = self.a_bias[:]
+        self.a_bias = [0.0, 0.0, 0.0]
+
+        # settle/warm-up
+        t0 = time.ticks_ms()
+        while time.ticks_diff(time.ticks_ms(), t0) < settle_ms:
+            self.read_sensor_data()
+            time.sleep_ms(5)
+
+        sx = sy = sz = 0.0
+        good = 0
+
+        for _ in range(samples):
+            d = self.read_sensor_data()
+            if d is None:
+                continue
+
+            ax, ay, az, gx, gy, gz, temp = d
+
+            # reject if moving (gyro-based)
+            if (abs(gx) > reject_if_abs_dps or
+                abs(gy) > reject_if_abs_dps or
+                abs(gz) > reject_if_abs_dps):
+                continue
+
+            sx += ax
+            sy += ay
+            sz += az
+            good += 1
+            time.sleep_ms(sample_delay_ms)
+
+        if good < max(10, samples // 4):
+            return None
+
+        axm, aym, azm = sx / good, sy / good, sz / good
+
+        # ideal gravity vector based on assumed orientation
+        ideal = [0.0, 0.0, 0.0]
+        axis_map = {"x": 0, "y": 1, "z": 2}
+        idx = axis_map.get(assume_up_axis, 2)
+        ideal[idx] = float(assume_up_sign) * 1.0  # 1g along that axis
+
+        bx = axm - ideal[0]
+        by = aym - ideal[1]
+        bz = azm - ideal[2]
+
+        self.a_bias[0], self.a_bias[1], self.a_bias[2] = bx, by, bz
+
+        if dest1 is not None:
+            dest1[0], dest1[1], dest1[2] = bx, by, bz
+
+        return bx, by, bz
+
+
+    def set_gyro_deadband(self, deadband_dps):
+        self.g_deadband_dps = float(deadband_dps)
 
     def read_sensor_data(self):
         """
@@ -259,6 +399,22 @@ class ICM42670:
             gx = gx_raw / self.gRes
             gy = gy_raw / self.gRes
             gz = gz_raw / self.gRes
+
+            # Apply calibration
+            ax -= self.a_bias[0]
+            ay -= self.a_bias[1]
+            az -= self.a_bias[2]
+
+            gx -= self.g_bias[0]
+            gy -= self.g_bias[1]
+            gz -= self.g_bias[2]
+
+            # Optional deadband for motion detection
+            db = self.g_deadband_dps
+            if db > 0.0:
+                if abs(gx) < db: gx = 0.0
+                if abs(gy) < db: gy = 0.0
+                if abs(gz) < db: gz = 0.0
 
             return ax, ay, az, gx, gy, gz, t
 
