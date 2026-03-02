@@ -1,4 +1,5 @@
 site_name: TKJHAT Micropython API
+site_url: https://A11UD.github.io/TKJHAT_MicroPyth_Documentation/
 
 nav:
   - Home: index.md
