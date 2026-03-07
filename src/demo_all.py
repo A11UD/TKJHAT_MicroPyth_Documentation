@@ -140,7 +140,7 @@ while True:
 
     now = time.ticks_ms()
 
-    if time.ticks_diff(now, last_display) >= 1000:
+    if time.ticks_diff(now, last_display) >= 3000:
 
         if state == states["show_temp"]:
             temp = sensor.read_temperature()
