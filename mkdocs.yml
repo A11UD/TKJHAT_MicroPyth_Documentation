@@ -4,7 +4,6 @@ site_url: https://A11UD.github.io/TKJHAT_MicroPyth_Documentation/
 nav:
   - Home: index.md
   - Sensors:
-      - Sensor Overview: Sensors/sensor_overview.md
       - Temp & Humi - HDC2021: Sensors/hdc2021.md
       - Buzzer:  Sensors/buzzer.md
       - Buttons:  Sensors/buttons.md
