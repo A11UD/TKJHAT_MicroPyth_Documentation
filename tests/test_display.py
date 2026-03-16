@@ -301,7 +301,6 @@ def test_draw_circle_r1_exact_points(import_display_with_fakes):
         (11, 10), (10, 11), (9, 10), (10, 9)
     }
     pixels = {(name_args[1][0], name_args[1][1]) for name_args in display.oled.calls if name_args[0] == "pixel"}
-    print(expected)
-    print("------------")
-    print(pixels)
+
+    # Check that the expected pixels for the circle with r=1 at (10,10) are drawn
     assert expected.issubset(pixels)  # some implementations may place diagonals for r=1
