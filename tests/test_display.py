@@ -87,7 +87,7 @@ class TimeStub:
 
 
 @pytest.fixture
-def import_display_with_fakes(monkeypatch, *, module_name='display'):
+def import_display_with_fakes(monkeypatch):
     """
     Import the display module fresh while stubbing 'ssd1306' and 'time'.
     Returns: (display_module, bus, ssd_stub, oled)
