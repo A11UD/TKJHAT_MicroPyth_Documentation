@@ -18,7 +18,7 @@ class VEML6030:
 
     # Low-level I2C helpers
 
-    def write_u24(self, value):
+    def _write_u24(self, value):
         """
         Write 3 bytes to veml6030 using i2c.
         
@@ -26,7 +26,7 @@ class VEML6030:
         """
         self.bus.writeto(self.ADDRESS, bytes([value[0] & 0xFF, value[1] & 0xFF, value[2] & 0xFF]), True)
 
-    def read_u16(self, cmd):
+    def _read_u16(self, cmd):
         """
         Read value from veml6030 using command code.
         
@@ -55,7 +55,7 @@ class VEML6030:
 
         """ 
         config = [self.CONFIG, 0x00, 0x10]      #[command code, data(LSB), data(MSB)]
-        self.write_u24(config)
+        self._write_u24(config)
         time.sleep_ms(10)
 
 
@@ -67,7 +67,7 @@ class VEML6030:
         
         """
     
-        bits = self.read_u16(self.READ_DATA)
+        bits = self._read_u16(self.READ_DATA)
         luxVal_uncorrected = bits * 0.5376      #convert read bits to lux
         if luxVal_uncorrected > 1000:
             luxVal = ((0.00000000000060135 * luxVal_uncorrected ** 4) - 
@@ -88,5 +88,5 @@ class VEML6030:
             #Set the bit 0 in the configuration to 1 -> power off
             # 0b0001 0000 0000 0001
         config = [self.CONFIG, 0x01, 0x10]   #[command code, data(LSB), data(MSB)]
-        self.write_u24(config)
+        self._write_u24(config)
         time.sleep_ms(10)
